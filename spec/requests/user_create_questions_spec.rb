@@ -2,13 +2,8 @@ require 'rails_helper'
 
 describe 'users can create questions' do
   context '#create' do
-    let(:user) do
-      User.create!(name: "Joana", email: "joana@teste.com")
-    end
 
-    let(:questionnaire) do
-      Questionnaire.create!(name: 'Lógica', description: 'É um teste', limit_time: 2, user: user)
-    end
+    let(:questionnaire) {create(:questionnaire)}
 
     context 'with valid params' do
       let(:questions_params) do
@@ -54,7 +49,7 @@ describe 'users can create questions' do
       it 'returns unprocessable entity response' do
         post '/api/v1/pergunta', params: questions_params
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:precondition_failed)
       end
 
       it 'returns the error message' do
@@ -62,7 +57,7 @@ describe 'users can create questions' do
 
         json = JSON.parse(response.body, symbolize_names: true)
 
-        expect(json[:errors][:description]).to include("não pode ficar em branco")
+        expect(json[:message]).to eq("A validação falhou: descrição não pode ficar em branco")
       end
     end
   end
